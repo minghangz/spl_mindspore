@@ -171,7 +171,8 @@ class Trainer:
         # start training
         num_train_batches = len(self.train_dataset)
         log_period = num_train_batches // self.configs.period
-        eval_period = num_train_batches // 2
+        # eval_period = num_train_batches // 2
+        eval_period = num_train_batches
         best_results = (-1., -1., -1., -1)
         self.logger.debug('Start training...')
         global_step = 0
@@ -194,20 +195,22 @@ class Trainer:
                 if local_step % log_period == 0:
                     meters.display(local_step, self.logger)
                 # evaluate
-                if global_step % eval_period == 0 or global_step % num_train_batches == 0:
-                    self.net.set_train(False)
+                # if global_step % eval_period == 0 or global_step % num_train_batches == 0:
+                #     self.net.set_train(False)
 
-                    r1i3, r1i5, r1i7, mi, score_str = eval_test(model=self.net, data_loader=self.eval_dataset,
-                        mode='test', epoch=epoch + 1, global_step=global_step, elastic=self.configs.elastic, max_len=self.configs.max_pos_len)
-                    self.logger.info('Epoch: %3d | Step: %5d | r1i3: %.2f | r1i5: %.2f | r1i7: %.2f | mIoU: %.2f' % (
-                        epoch + 1, global_step, r1i3, r1i5, r1i7, mi))
-                    results = (r1i3, r1i5, r1i7, mi)
-                    if self.configs.deploy:
-                        save_checkpoint(model_dir, self.net, is_best=(sum(results) > sum(best_results)))
-                    if sum(results) > sum(best_results): best_results = results
-                    self.net.set_train(True)
+                #     r1i3, r1i5, r1i7, mi, score_str = eval_test(model=self.net, data_loader=self.eval_dataset,
+                #         mode='test', epoch=epoch + 1, global_step=global_step, elastic=self.configs.elastic, max_len=self.configs.max_pos_len)
+                #     self.logger.info('Epoch: %3d | Step: %5d | r1i3: %.2f | r1i5: %.2f | r1i7: %.2f | mIoU: %.2f' % (
+                #         epoch + 1, global_step, r1i3, r1i5, r1i7, mi))
+                #     results = (r1i3, r1i5, r1i7, mi)
+                #     if self.configs.deploy:
+                #         save_checkpoint(model_dir, self.net, is_best=(sum(results) > sum(best_results)))
+                #     if sum(results) > sum(best_results): best_results = results
+                #     self.net.set_train(True)
+        if self.configs.deploy:
+            save_checkpoint(model_dir, self.net, filename='checkpoint_%d.ckpt'%epoch)
         self.logger.debug('Done training')
-        self.logger.info('Best results yielded - r1i3: %.2f | r1i5: %.2f | r1i7: %.2f | mIoU: %.2f' % best_results)
+        # self.logger.info('Best results yielded - r1i3: %.2f | r1i5: %.2f | r1i7: %.2f | mIoU: %.2f' % best_results)
         return best_results
 
 # training

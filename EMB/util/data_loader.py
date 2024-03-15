@@ -58,7 +58,7 @@ class Dataset:
 def get_train_loader(dataset, video_features, configs):
     train_set = Dataset(dataset=dataset, video_features=video_features)
     train_loader = ds.GeneratorDataset(train_set, column_names=['indexes', 'vfeats', 'vfeat_lens', 'word_ids', 'char_ids', 's_labels', 'e_labels', 'h_labels'], shuffle=True)
-    train_loader = train_loader.batch(batch_size=configs.batch_size, drop_remainder=True)
+    train_loader = train_loader.batch(batch_size=configs.batch_size, drop_remainder=False)
     return train_loader
 
 
